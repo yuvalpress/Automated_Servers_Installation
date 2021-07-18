@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import asyncio
 
 from Scripts.iDrac_Scripts import pre_iDrac as pre
 from Scripts.iDrac_Scripts import iDrac_IP_Address as set_ip
@@ -49,17 +50,18 @@ def config(iDracs, ex):
     except Exception as err:
         print("Failed with the following error: %s\n" % err)
 
-    # print("Creating ISO Costumed images..")
-    # try:
-    #     print(sys.argv[1])
-    #     sub = subprocess.Popen(
-    #         ["C:\\Users\\admin\\Desktop\\Automated Configuration\\Scripts\\ISO_Scripts\\call_bash_environment.cmd",
-    #          sys.argv[1]], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #     print(str(sub.stdout.read()), "\n")
-    #     print("error: ", sub.stderr.read())
-    #     print("Done!\n")
-    # except Exception as err:
-    #     print("Failed with the following error: %s\n" % err)
+    print("Creating ISO Costumed images..")
+    try:
+        path = sys.argv[1]
+        print(path)
+        sub = subprocess.Popen(
+            ["C:\\Users\\admin\\Desktop\\Automated Configuration\\Scripts\\ISO_Scripts\\call_bash_environment.cmd",
+             path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print(str(sub.stdout.read()), "\n")
+        print("error: ", sub.stderr.read())
+        print("Done!\n")
+    except Exception as err:
+        print("Failed with the following error: %s\n" % err)
 
     print("Mounting ISO Costumed images..")
     try:
@@ -68,17 +70,23 @@ def config(iDracs, ex):
                                     "& \"C:\\Users\\admin\\Desktop\\Automated "
                                     "Configuration\\Scripts\\ISO_Scripts\\Bash Scripts\\mountISO.ps1\" {}.iso {}".format(
                                         server.name, server.ip)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print(sub.stdout.read(), "\n")
-            print("error: ", sub.stderr.read())
+            if "ERROR: Unable to perform requested operation." in str(sub.stdout.read()).strip("b'").replace("\\r\\n",
+                                                                                                             "").replace(
+                    "\\r", ""):
+                print(idrac_stracture.colors.FAIL + "You'll have to mount the ISO yourself because the RACADM "
+                                                    "remoteimage module doesn't work on "
+                                                    "iDrac {}".format(server.ip) + idrac_stracture.colors.ENDC)
+
             print("Done!\n")
     except Exception as err:
         print("Failed with the following error: %s\n" % err)
 
-    print(
-        "Don't close the script window! Making sure Operating Systems were installed successfully and initiating post "
-        "installation configuration process.")
+    print(idrac_stracture.colors.OKPURPLE +
+          "Don't close the script window! Making sure Operating Systems were installed successfully and initiating "
+          "post "
+          "installation configuration process." + idrac_stracture.colors.ENDC)
     try:
-        post_storage.post(ex)
+        asyncio.run(post_storage.post(ex))
     except Exception as err:
         print("Failed with the following error: ", err)
 

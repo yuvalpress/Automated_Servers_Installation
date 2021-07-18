@@ -10,7 +10,7 @@ def summon(file):
     wb = load_workbook(file, data_only=True)
     sheet = wb["Server_Configuration"]
 
-    #set full os data
+    # set full os data
     for row in sheet.iter_rows(min_row=7, min_col=1):
         if row[1].value == 1:
             idrac_ip = row[9].value
@@ -34,7 +34,7 @@ def summon(file):
                 ["python3", "/mnt/c/Users/admin/Desktop/Automated "
                             "Configuration/Scripts/ISO_Scripts/ESXi_6.5_ISO_Create.py", idrac_ip, hostname, "single",
                  ip, subnet,
-                 gateway, ntp, dns, interface, interface2], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                 gateway, ntp, dns, interface, interface2, "&"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             print(sub.stdout.read(), "\n")
             print("error:", sub.stderr.readlines())
 
@@ -45,7 +45,7 @@ def summon(file):
                     ["python3", "/mnt/c/Users/admin/Desktop/Automated "
                                 "Configuration/Scripts/ISO_Scripts/RHEL_7.6_ISO_Create.py", idrac_ip, hostname,
                      "team", ip,
-                     "%s" % subnet, gateway, ntp, dns, interface, interface2], stdout=subprocess.PIPE,
+                     "%s" % subnet, gateway, ntp, dns, interface, interface2, "&"], stdout=subprocess.PIPE,
                     universal_newlines=True)
                 for stdout_line in iter(popen.stdout.readline, ""):
                     print(str(stdout_line))
@@ -58,7 +58,7 @@ def summon(file):
                     ["python3", "/mnt/c/Users/admin/Desktop/Automated "
                                 "Configuration/Scripts/ISO_Scripts/RHEL_7.6_ISO_Create.py", idrac_ip, hostname,
                      "single", ip, subnet,
-                     gateway, ntp, dns, interface], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                     gateway, ntp, dns, interface, "&"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 print(sub.stdout.read(), "\n")
                 print(sub.stderr.read())
         elif "RHEL7.5" in os:
@@ -68,7 +68,7 @@ def summon(file):
                     ["python3", "/mnt/c/Users/admin/Desktop/Automated "
                                 "Configuration/Scripts/ISO_Scripts/RHEL_7.5_ISO_Create.py", idrac_ip, hostname,
                      "team", ip,
-                     "%s" % subnet, gateway, ntp, dns, interface, interface2], stdout=subprocess.PIPE,
+                     "%s" % subnet, gateway, ntp, dns, interface, interface2, "&"], stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE)
                 print(sub.stdout.read(), "\n")
                 print(sub.stderr.read())
@@ -78,11 +78,21 @@ def summon(file):
                     ["python3", "/mnt/c/Users/admin/Desktop/Automated "
                                 "Configuration/Scripts/ISO_Scripts/RHEL_7.5_ISO_Create.py", idrac_ip, hostname,
                      "single", ip, subnet,
-                     gateway, ntp, dns, interface], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                     gateway, ntp, dns, interface, "&"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 print(sub.stdout.read(), "\n")
                 print(sub.stderr.read())
 
 
 if __name__ == "__main__":
-    print(summon(str(sys.argv[1])))
-    sys.exit()
+    path, i, args_len = "", 1, len(sys.argv) - 1
+    while i <= args_len:
+        path = path + str(sys.argv[i]) + " "
+        i = i + 1
+
+    if path[-1] == " ":
+        path = path[:-1]
+
+    with open("/mnt/c/Users/admin/Desktop/Automated Configuration/test.txt", "wt") as file:
+        file.write(path)
+
+    print(summon(str(path)))

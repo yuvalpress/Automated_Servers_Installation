@@ -21,7 +21,7 @@ async def summon_post_async(iDracsList, os_list):
     await asyncio.gather(*[post_async(x, y) for x, y in zip(iDracsList, os_list)])
 
 
-def post(excel_file):
+async def post(excel_file):
     try:
         iDracs = idrac_stracture.readExcel(excel_file).read()
         idracs_list = []
@@ -70,7 +70,7 @@ def post(excel_file):
         sleep(90)  # waiting for server to fully boot
 
         # start post installation raid and physical disks configuration in async way
-        summon_post_async(idracs_list, os_data)
+        await summon_post_async(idracs_list, os_data)
 
     except Exception as err:
         print("Failed with the following error: ", err)

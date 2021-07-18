@@ -385,6 +385,8 @@ class readExcel:
                                          "pdisks": [sheet.cell_value(i, 17), sheet.cell_value(i, 19)],
                                          "IP_Check": sheet.cell_value(i, 20), "Raid1_Check": 0,
                                          "Raid2_Check": sheet.cell_value(i, 22), "server_type": sheet.cell_value(i, 4)}
+
+
                             else:
                                 iDrac = {"tmp_ip": sheet.cell_value(i, 8), "ip_address": sheet.cell_value(i, 9),
                                          "subnet": sheet.cell_value(i, 10), "gateway": sheet.cell_value(i, 11),
@@ -395,31 +397,34 @@ class readExcel:
                                          "IP_Check": sheet.cell_value(i, 20), "Raid1_Check": sheet.cell_value(i, 21),
                                          "Raid2_Check": 0, "server_type": sheet.cell_value(i, 4)}
 
-                    else:
-                        print(line, 1)
-                        sub = subprocess.Popen(
-                            ["powershell", "& racadm -r {} -u root -p password storage get vdisks".format(sheet.cell_value(i, 9))],
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                        output = sub.stdout.readlines()
-                        for line in output:
-                            if "RAID.Integrated.1-1" in line:
-                                iDrac = {"tmp_ip": sheet.cell_value(i, 8), "ip_address": sheet.cell_value(i, 9),
-                                         "subnet": sheet.cell_value(i, 10), "gateway": sheet.cell_value(i, 11),
-                                         "name": sheet.cell_value(i, 6), "vconsole": sheet.cell_value(i, 13),
-                                         "timezone": sheet.cell_value(i, 14), "boot_mode": sheet.cell_value(i, 12),
-                                         "vdisks": [sheet.cell_value(i, 16), sheet.cell_value(i, 18)],
-                                         "pdisks": [sheet.cell_value(i, 17), sheet.cell_value(i, 19)],
-                                         "IP_Check": sheet.cell_value(i, 20), "Raid1_Check": 0,
-                                         "Raid2_Check": sheet.cell_value(i, 22), "server_type": sheet.cell_value(i, 4)}
-                            else:
-                                iDrac = {"tmp_ip": sheet.cell_value(i, 8), "ip_address": sheet.cell_value(i, 9),
-                                         "subnet": sheet.cell_value(i, 10), "gateway": sheet.cell_value(i, 11),
-                                         "name": sheet.cell_value(i, 6), "vconsole": sheet.cell_value(i, 13),
-                                         "timezone": sheet.cell_value(i, 14), "boot_mode": sheet.cell_value(i, 12),
-                                         "vdisks": [sheet.cell_value(i, 16), sheet.cell_value(i, 18)],
-                                         "pdisks": [sheet.cell_value(i, 17), sheet.cell_value(i, 19)],
-                                         "IP_Check": sheet.cell_value(i, 20), "Raid1_Check": sheet.cell_value(i, 21),
-                                         "Raid2_Check": 0, "server_type": sheet.cell_value(i, 4)}
+                            # Append al idrac data
+                            iDrac_Data.append(iDrac)
+                            break
+
+                    # else:
+                    #     sub = subprocess.Popen(
+                    #         ["powershell", "& racadm -r {} -u root -p password storage get vdisks".format(sheet.cell_value(i, 9))],
+                    #         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    #     output = sub.stdout.readlines()
+                    #     for line in output:
+                    #         if "RAID.Integrated.1-1" in str(line):
+                    #             iDrac = {"tmp_ip": sheet.cell_value(i, 8), "ip_address": sheet.cell_value(i, 9),
+                    #                      "subnet": sheet.cell_value(i, 10), "gateway": sheet.cell_value(i, 11),
+                    #                      "name": sheet.cell_value(i, 6), "vconsole": sheet.cell_value(i, 13),
+                    #                      "timezone": sheet.cell_value(i, 14), "boot_mode": sheet.cell_value(i, 12),
+                    #                      "vdisks": [sheet.cell_value(i, 16), sheet.cell_value(i, 18)],
+                    #                      "pdisks": [sheet.cell_value(i, 17), sheet.cell_value(i, 19)],
+                    #                      "IP_Check": sheet.cell_value(i, 20), "Raid1_Check": 0,
+                    #                      "Raid2_Check": sheet.cell_value(i, 22), "server_type": sheet.cell_value(i, 4)}
+                    #         else:
+                    #             iDrac = {"tmp_ip": sheet.cell_value(i, 8), "ip_address": sheet.cell_value(i, 9),
+                    #                      "subnet": sheet.cell_value(i, 10), "gateway": sheet.cell_value(i, 11),
+                    #                      "name": sheet.cell_value(i, 6), "vconsole": sheet.cell_value(i, 13),
+                    #                      "timezone": sheet.cell_value(i, 14), "boot_mode": sheet.cell_value(i, 12),
+                    #                      "vdisks": [sheet.cell_value(i, 16), sheet.cell_value(i, 18)],
+                    #                      "pdisks": [sheet.cell_value(i, 17), sheet.cell_value(i, 19)],
+                    #                      "IP_Check": sheet.cell_value(i, 20), "Raid1_Check": sheet.cell_value(i, 21),
+                    #                      "Raid2_Check": 0, "server_type": sheet.cell_value(i, 4)}
                 else:
                     iDrac = {"tmp_ip": sheet.cell_value(i, 8), "ip_address": sheet.cell_value(i, 9),
                              "subnet": sheet.cell_value(i, 10), "gateway": sheet.cell_value(i, 11),
@@ -429,11 +434,11 @@ class readExcel:
                              "pdisks": [sheet.cell_value(i, 17), sheet.cell_value(i, 19)],
                              "IP_Check": sheet.cell_value(i, 20), "Raid1_Check": sheet.cell_value(i, 21),
                              "Raid2_Check": sheet.cell_value(i, 22), "server_type": sheet.cell_value(i, 4)}
-                # Append al idrac data
-                iDrac_Data.append(iDrac)
+
+                    # Append al idrac data
+                    iDrac_Data.append(iDrac)
 
         return iDrac_Data
-
 
 class raidData:
     def __init__(self, ip, raid, disks, raid1_check, raid2_check):
@@ -478,7 +483,7 @@ class raidData:
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             output = sub.stdout.readlines()
             for r in output:
-                if "RAID" in str(r).strip("b'").replace("\\r\\n", "").replace(" ", "").replace("\\r", ""):
+                if "RAID.Integrated" in str(r).strip("b'").replace("\\r\\n", "").replace(" ", "").replace("\\r", ""):
                     controller = str(r).strip("b'").replace("\\r\\n", "").replace(" ", "").replace("\\r", "")
 
             return controller
